@@ -1,17 +1,18 @@
 #!/bin/sh
 
+# LABEL
+LABEL="Bruh"
+
 # TAKE A SCREENSHOT
 SCREENSHOT=/tmp/screen.png
 scrot $SCREENSHOT
 
 # GET PREVALENT COLOR (HEX)
-function primcolor {
-	INFO=$(convert $1 -scale 50x50! -depth 8 +dither -colors 8 -format "%c" histogram:info: | \
+convert $SCREENSHOT -gravity center -crop 300x80+0+0 /tmp/center.png
+HEX=$(convert /tmp/center.png -scale 50x50! -depth 8 +dither -colors 8 -format "%c" histogram:info: | \
 		sed -n 's/^[ ]*\(.*\):.*[#]\([0-9a-fA-F]*\) .*$/\1,#\2/p' | sort -r -n -k 1 -t "," | head -n 1 | cut -d "," -f2)
-	echo $INFO
-}
 
-HEX=$(primcolor $SCREENSHOT)
+
 HEX="${HEX//#}"
 
 # CONVERT TO RGB
@@ -36,7 +37,7 @@ then
   	-gravity Center \
   	-pointsize 40 \
   	-fill white \
-  	-annotate 0 'Ciao, Giovanni' \
+	-annotate 0 "$LABEL" \
   	$SCREENSHOT
 else
   echo "NERO"
@@ -46,12 +47,13 @@ else
   	-gravity Center \
   	-pointsize 40 \
   	-fill black \
-  	-annotate 0 'Ciao, Giovanni' \
+	-annotate 0 "$LABEL" \
   	$SCREENSHOT
 fi
+
 i3lock -u --ignore-empty-password --show-failed-attempts --nofork --image $SCREENSHOT
 rm $SCREENSHOT
-
+rm /tmp/center.png
 
 #  TEXT SHADOW
 #  convert $SCREENSHOT \
